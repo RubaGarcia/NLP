@@ -9,7 +9,7 @@ import pprint
 pat_1 = '(\w+)@(\w+)\.(?:edu|EDU)' 
 pat_2 = '(\w+) @ (\w+)\.(?:edu|EDU)'
 pat_3 = '((?:\w+)\.(?:\w+))@(\w+)\.(?:edu|EDU)' 
-email_pat = '(\w+)(?: ?@ ?)((?:\w+\.)*(?:\w+))\.(?:edu|EDU)'
+email_pat = '(\w+)(?: ?@|\&\#x40\; ?)((?:\w+\.)*(?:\w+))\.(?:edu|EDU)'
 dash_pat = '(.+)@(.+)\.(?:-e-d-u)'
 engler_pat = '(\w+) WHERE (\w+) DOM edu'
 pure_subh_serafim_text_pat = '(\w+) at ((?:\w+ dot )*(?:\w+)) dot edu'  
@@ -17,9 +17,9 @@ vladlen = '(\w+)(?:%20)(?:at)(?:%20)(\w+)(?:%20)(?:dot)(?:%20)(?:edu)'
 obfuscate_pat = '\'(\w+)\.edu\',\'(\w+)\'' #Caso especial: dar la vuelta a los grupos
 text_and_symbols_pat = '(\w+(?<![Ss][eE][rR][vV][eE][rR])) at ((?:\w+\.)(?:\w+))\.edu'
 ullman = '(\w+) (?:at) (\w+) (?:dt) (?:com)' #caso especial -> no .edu si .com
+#nick = '(\w+\.)\w+@(\w+\.)+edu' #caso de nick (nombre.apellido@pipi.pupu.edu)
 
-
-#TODO: Siguiente a revisar: levoy
+#TODO: Siguiente a revisar: nick
 """ 
 TODO
 This function takes in a filename along with the file object and
