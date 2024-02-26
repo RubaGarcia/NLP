@@ -26,6 +26,10 @@ text_no_dots = '(\w+) at ((?:\w+ )*\w+)(?<!dot) edu' #caso especial: no hay punt
 #psyoung = '\<A[^\>]+\>(\w+(?:\.\w+)*)@((?:\w+\.)*\w+).edu' # Creo que ya estan en el nuevo email_pat
 jks = '(\w+) at ((?:\w+\;)*\w+)\;edu'
 
+phone_main_pat = '(\d{3})-(\d{3})-(\d{4})'
+parenthesis_phone = '\((\d{3})\) ?(\d{3})-(\d{4})'
+spaces_phone = '\+\d+ (\d{3})[ -](\d{3})[ -](\d{4})'
+
 #TODO: Siguiente a revisar: pal
 """ 
 TODO
@@ -42,6 +46,7 @@ match the gold answers
 def process_file(name, f):
     res = []
     for line in f:
+        # MAILS
         main_matches = re.findall(email_pat,line)
         for m in main_matches:
             email = '%s@%s.edu' % m
@@ -142,6 +147,26 @@ def process_file(name, f):
                 str.append(m[i].replace(';','.'))
             email = '%s@%s.edu' % tuple(str)
             match_found = (name,'e',email)
+            if match_found not in res:
+                res.append(match_found)
+
+        # PHONES
+        phone_matches = re.findall(phone_main_pat,line)
+        for m in phone_matches:
+            phone = '%s-%s-%s' % m
+            res.append((name,'p',phone))
+
+        parenthesis_phone_matches = re.findall(parenthesis_phone,line)
+        for m in parenthesis_phone_matches:
+            phone = '%s-%s-%s' % m
+            match_found = (name,'p',phone)
+            if match_found not in res:
+                res.append(match_found)
+
+        spaces_phone_matches = re.findall(spaces_phone,line)
+        for m in spaces_phone_matches:
+            phone = '%s-%s-%s' % m
+            match_found = (name,'p',phone)
             if match_found not in res:
                 res.append(match_found)
     return res
