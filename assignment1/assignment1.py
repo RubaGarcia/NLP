@@ -19,6 +19,9 @@ text_and_symbols_pat = '(\w+(?<![Ss][eE][rR][vV][eE][rR])) at ((?:\w+\.)(?:\w+))
 ullman = '(\w+) (?:at) (\w+) (?:dt) (?:com)' #caso especial -> no .edu si .com
 #nick = '(\w+\.)\w+@(\w+\.)+edu' #caso de nick (nombre.apellido@pipi.pupu.edu)
 
+
+
+#tlf = '\d{3})-\d{3}-\d{4}' #NNN-NNN-NNNN
 #TODO: Siguiente a revisar: nick
 """ 
 TODO
@@ -35,7 +38,7 @@ match the gold answers
 def process_file(name, f):
     res = []
     for line in f:
-        matches = re.findall(email_pat,line)
+        matches = re.findall(tlf,line)
         for m in matches:
             email = '%s@%s.edu' % m
             res.append((name,'e',email))
