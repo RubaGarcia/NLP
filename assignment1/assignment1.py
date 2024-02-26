@@ -9,17 +9,24 @@ import pprint
 pat_1 = '(\w+)@(\w+)\.(?:edu|EDU)' 
 pat_2 = '(\w+) @ (\w+)\.(?:edu|EDU)'
 pat_3 = '((?:\w+)\.(?:\w+))@(\w+)\.(?:edu|EDU)' 
-email_pat = '(\w+)(?: ?@|\&\#x40\; ?)((?:\w+\.)*(?:\w+))\.(?:edu|EDU)'
+#email_pat = '(\w+)(?: ?@|\&\#x40\; ?)((?:\w+\.)*(?:\w+))\.(?:edu|EDU)'
+email_pat = '(\w+(?:\.\w+)*)(?: ?@|\&\#x40\; ?)((?:\w+\.)*(?:\w+))\.(?:edu|EDU)' #prueba para quitar falsos positivos
 dash_pat = '(.+)@(.+)\.(?:-e-d-u)'
 engler_pat = '(\w+) WHERE (\w+) DOM edu'
-pure_subh_serafim_text_pat = '(\w+) at ((?:\w+ dot )*(?:\w+)) dot edu'  
-vladlen = '(\w+)(?:%20)(?:at)(?:%20)(\w+)(?:%20)(?:dot)(?:%20)(?:edu)'                     
+pure_subh_serafim_text_pat = '(\w+) at ((?:\w+ dot )*(?:\w+)) dot edu' # Procesarlo quitando los "dot"
+vladlen = '(\w+)(?:%20)(?:at)(?:%20)(\w+)(?:%20)(?:dot)(?:%20)(?:edu)' # NO AÑADE NADA
 obfuscate_pat = '\'(\w+)\.edu\',\'(\w+)\'' #Caso especial: dar la vuelta a los grupos
 text_and_symbols_pat = '(\w+(?<![Ss][eE][rR][vV][eE][rR])) at ((?:\w+\.)(?:\w+))\.edu'
-ullman = '(\w+) (?:at) (\w+) (?:dt) (?:com)' #caso especial -> no .edu si .com
+support_ullman = '(\w+) (?:at) (\w+) (?:dt) (?:com)' #caso especial -> no .edu si .com
+main_ullman = '(\w+(?:\.\w+)*) @ ((?:\w+\.)*\w+).edu'
 #nick = '(\w+\.)\w+@(\w+\.)+edu' #caso de nick (nombre.apellido@pipi.pupu.edu)
+mailto = '"mailto:([^@]*)@([^@]*)\.edu"' #casos con mailto # NO AÑADE NADA
+followed_by = '(\w+(?:\.\w+)*)[^\(\n\>]+\(followed by[^@]+@((?:\w+.)*\w+)\.edu'
+text_no_dots = '(\w+) at ((?:\w+ )*\w+)(?<!dot) edu' #caso especial: no hay puntos, hay que añadirlos en el proceso
+#psyoung = '\<A[^\>]+\>(\w+(?:\.\w+)*)@((?:\w+\.)*\w+).edu' # Creo que ya estan en el nuevo email_pat
+jks = '(\w+) at ((?:\w+\;)*\w+)\;edu'
 
-#TODO: Siguiente a revisar: nick
+#TODO: Siguiente a revisar: pal
 """ 
 TODO
 This function takes in a filename along with the file object and
@@ -35,10 +42,108 @@ match the gold answers
 def process_file(name, f):
     res = []
     for line in f:
-        matches = re.findall(email_pat,line)
-        for m in matches:
+        main_matches = re.findall(email_pat,line)
+        for m in main_matches:
             email = '%s@%s.edu' % m
             res.append((name,'e',email))
+
+        dash_matches = re.findall(dash_pat,line)
+        for m in dash_matches:
+            str = []
+            for i in range(len(m)):
+                str.append(m[i].replace('-',''))
+            email = '%s@%s.edu' % tuple(str)
+            match_found = (name,'e',email)
+            if match_found not in res:
+                res.append(match_found)
+
+        engler_matches = re.findall(engler_pat,line)
+        for m in engler_matches:
+            email = '%s@%s.edu' % m
+            match_found = (name,'e',email)
+            if match_found not in res:
+                res.append(match_found)
+
+        pure_subh_serafim_text_matches = re.findall(pure_subh_serafim_text_pat,line)
+        for m in pure_subh_serafim_text_matches:
+            str = []
+            for i in range(len(m)):
+                str.append(m[i].replace(' dot ','.'))
+            email = '%s@%s.edu' % tuple(str)
+            match_found = (name,'e',email)
+            if match_found not in res:
+                res.append(match_found)
+
+        # NO AÑADE NADA
+        vladlen_matches = re.findall(vladlen,line)
+        for m in vladlen_matches:
+            email = '%s@%s.edu' % m
+            match_found = (name,'e',email)
+            if match_found not in res:
+                res.append(match_found)
+                
+        obfuscate_matches = re.findall(obfuscate_pat,line)
+        for m in obfuscate_matches:
+            email = '%s@%s.edu' % tuple(reversed(m))
+            match_found = (name,'e',email)
+            if match_found not in res:
+                res.append(match_found)
+
+        text_and_symbols_matches = re.findall(text_and_symbols_pat,line)
+        for m in text_and_symbols_matches:
+            email = '%s@%s.edu' % m
+            match_found = (name,'e',email)
+            if match_found not in res:
+                res.append(match_found)
+
+        support_ullman_matches = re.findall(support_ullman,line)
+        for m in support_ullman_matches:
+            email = '%s@%s.com' % m
+            match_found = (name,'e',email)
+            if match_found not in res:
+                res.append(match_found)
+
+        main_ullman_matches = re.findall(main_ullman,line)
+        for m in main_ullman_matches:
+            email = '%s@%s.edu' % m
+            match_found = (name,'e',email)
+            if match_found not in res:
+                res.append(match_found)
+
+        # NO AÑADE NADA
+        mailto_matches = re.findall(mailto,line)
+        for m in mailto_matches:
+            email = '%s@%s.edu' % m
+            match_found = (name,'e',email)
+            if match_found not in res:
+                res.append(match_found)
+
+        followed_by_matches = re.findall(followed_by,line)
+        for m in followed_by_matches:
+            email = '%s@%s.edu' % m
+            match_found = (name,'e',email)
+            if match_found not in res:
+                res.append(match_found)
+
+        text_no_dots_matches = re.findall(text_no_dots,line)
+        for m in text_no_dots_matches:
+            str = []
+            for i in range(len(m)):
+                str.append(m[i].replace(' ','.'))
+            email = '%s@%s.edu' % tuple(str)
+            match_found = (name,'e',email)
+            if match_found not in res:
+                res.append(match_found)
+
+        jks_matches = re.findall(jks,line)
+        for m in jks_matches:
+            str = []
+            for i in range(len(m)):
+                str.append(m[i].replace(';','.'))
+            email = '%s@%s.edu' % tuple(str)
+            match_found = (name,'e',email)
+            if match_found not in res:
+                res.append(match_found)
     return res
 
 """
