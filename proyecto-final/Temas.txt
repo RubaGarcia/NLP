@@ -1,0 +1,17 @@
+Glassdoor Data Science Jobs
+	https://www.kaggle.com/datasets/kuralamuthan300/glassdoor-data-science-jobs
+AI Vs Human
+	https://www.kaggle.com/datasets/shanegerami/ai-vs-human-text
+Hate speech detection
+	https://www.kaggle.com/datasets/waalbannyantudre/hate-speech-detection-curated-dataset
+Fake news Detection
+	https://www.kaggle.com/datasets/bhavikjikadara/fake-news-detection
+LinkedIn Job Postings 2023
+	https://www.kaggle.com/datasets/arshkon/linkedin-job-postings
+Twitter Sentiment Analysis
+	https://www.kaggle.com/datasets/jp797498e/twitter-entity-sentiment-analysis
+Language detection
+	https://www.kaggle.com/datasets/basilb2s/language-detection
+Emotions
+	https://www.kaggle.com/datasets/nelgiriyewithana/emotions
+
