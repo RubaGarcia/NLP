@@ -30,9 +30,9 @@ phone_main_pat = '(\d{3})-(\d{3})-(\d{4})'
 parenthesis_phone = '\((\d{3})\) ?(\d{3})-(\d{4})'
 spaces_phone = '\+\d+ (\d{3})[ -](\d{3})[ -](\d{4})'
 
-#TODO: Siguiente a revisar: pal
+
 """ 
-TODO
+
 This function takes in a filename along with the file object and
 scans its contents against regex patterns. It returns a list of
 (filename, type, value) tuples where type is either an 'e' or a 'p'

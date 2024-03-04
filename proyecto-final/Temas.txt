@@ -1,6 +1,6 @@
 Glassdoor Data Science Jobs
 	https://www.kaggle.com/datasets/kuralamuthan300/glassdoor-data-science-jobs
-AI Vs Human
+AI Vs Human **ESTE**
 	https://www.kaggle.com/datasets/shanegerami/ai-vs-human-text
 Hate speech detection
 	https://www.kaggle.com/datasets/waalbannyantudre/hate-speech-detection-curated-dataset
