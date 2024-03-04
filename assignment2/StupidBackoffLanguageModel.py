@@ -6,7 +6,7 @@ class StupidBackoffLanguageModel:
     self.unigramCounts = collections.defaultdict(lambda: 0) # c(w)
     self.bigramCounts = collections.defaultdict(lambda: 0) # c(w_i-1, w_i)
     self.words = set([]) # V value
-    self.tokens = [] # N value
+    self.tokens = 0 # N value
     self.train(corpus)
 
   def train(self, corpus):
@@ -21,7 +21,7 @@ class StupidBackoffLanguageModel:
         self.unigramCounts[nextToken] += 1
         self.bigramCounts[(token, nextToken)] += 1
         self.words.add(nextToken)
-        self.tokens.append(nextToken)
+        self.tokens += 1
         token = nextToken
       nextToken = sentence.data[-1].word
       self.unigramCounts[nextToken] += 1
@@ -45,4 +45,4 @@ class StupidBackoffLanguageModel:
     if self.bigramCounts[(prev_word,word)] > 0:
       return self.bigramCounts[(prev_word,word)] / self.unigramCounts[prev_word]
     else:
-      return 0.4 * ((self.unigramCounts[word] + 1)/ (len(self.tokens)+len(self.words)))
+      return 0.4 * ((self.unigramCounts[word] + 1)/ (self.tokens+len(self.words)))

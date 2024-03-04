@@ -10,7 +10,7 @@ class KneserNeyLanguageModel:
     self.nPrevCounts = collections.defaultdict(lambda: set([])) # c(., w)
     self.nNextCounts = collections.defaultdict(lambda: set([])) # c(w, .)
     self.words = set([]) # V value
-    self.tokens = [] # N value
+    self.tokens = 0 # N value
     self.d=2
     self.train(corpus)
 
@@ -29,7 +29,7 @@ class KneserNeyLanguageModel:
         self.nPrevCounts[nextToken].add(token)
         self.nNextCounts[token].add(nextToken)
         self.words.add(nextToken)
-        self.tokens.append(nextToken)
+        self.tokens += 1
         token = nextToken
       nextToken = sentence.data[-1].word
       self.unigramCounts[nextToken] += 1
@@ -43,7 +43,7 @@ class KneserNeyLanguageModel:
         sentence using your language model. Use whatever data you computed in train() here.
     """
     prob = 0.0
-    
+
     for i in range(1, len(sentence)):
       prev_word = sentence[i-1]
       word = sentence[i]
@@ -54,7 +54,7 @@ class KneserNeyLanguageModel:
     if self.numerator(word,prev_word) > 0:
       return self.numerator(word,prev_word)/self.unigramCounts[prev_word]
     else:
-      return (self.unigramCounts[word] + 1)/(len(self.tokens) + len(self.words))
+      return (self.unigramCounts[word] + 1)/(self.tokens + len(self.words))
   
   def numerator(self,word,prev_word):
     return max(self.bigramCounts[(prev_word,word)] - self.d, 0) + self.d * len(self.nNextCounts[prev_word]) * len(self.nPrevCounts[word]) / len(self.nBigramCounts)

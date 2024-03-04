@@ -6,7 +6,7 @@ class LaplaceUnigramLanguageModel:
     """Initialize your data structures in the constructor."""
     self.unigramCounts = collections.defaultdict(lambda: 0) 
     self.words = set([]) # V value
-    self.tokens = [] # N value
+    self.tokens = 0 # N value
     self.train(corpus)
 
   def train(self, corpus):
@@ -18,7 +18,7 @@ class LaplaceUnigramLanguageModel:
         token = datum.word
         self.words.add(token)
         self.unigramCounts[token] += 1
-        self.tokens.append(token)
+        self.tokens += 1
 
   def score(self, sentence):
     """ Takes a list of strings as argument and returns the log-probability of the 
@@ -32,4 +32,4 @@ class LaplaceUnigramLanguageModel:
     return prob
 
   def probablility(self, word):
-    return (self.unigramCounts[word] + 1) / (len(self.tokens) + len(self.words))
+    return (self.unigramCounts[word] + 1) / (self.tokens + len(self.words))
