@@ -41,27 +41,57 @@ class NaiveBayes:
     self.prior=[0.0,0.0]
 
   #############################################################################
-  # TODO TODO TODO TODO TODO 
+  
   
   def classify(self, words):
-    """ TODO
+    """
       'words' is a list of words to classify. Return 'pos' or 'neg' classification.
     """
-    return 'pos'
+
+    posWords = sum(self.countspos.values())
+    negWords = sum(self.countsneg.values())
+
+    self.prior[0]=0.0
+    self.prior[1]=0.0
+       
+    for word in words:
+      posCount=self.countspos[word]
+      negCount=self.countsneg[word]
+    
+      if word in self.vocab:
+        self.prior[0]+=math.log((posCount + 1)/(posWords + len(self.vocab)))
+        self.prior[1]+=math.log((negCount + 1)/(negWords + len(self.vocab)))
+      else:
+        self.prior[0]+=math.log((posCount + 1)/(posWords + len(self.vocab) + 1))
+        self.prior[1]+=math.log((negCount + 1)/(negWords + len(self.vocab) + 1))
+
+    if self.prior[0]>=self.prior[1]:
+      return 'pos'
+    else:
+      return 'neg'
   
 
   def addExample(self, klass, words):
     """
-     * TODO
      * Train your model on an example document with label klass ('pos' or 'neg') and
      * words, a list of strings.
      * You should store whatever data structures you use for your classifier 
      * in the NaiveBayes class.
      * Returns nothing
     """
+    
+    if (klass=='pos'):
+      for word in words:
+        self.countspos[word]+=1
+        self.vocab.add(word)
+    else:
+      for word in words:
+        self.countsneg[word]+=1
+        self.vocab.add(word)
+    
     pass 
         
-  # TODO TODO TODO TODO TODO 
+
   #############################################################################
   
   
