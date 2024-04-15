@@ -142,7 +142,7 @@ class IRSystem:
         """
         print("Indexing...")
         # ------------------------------------------------------------------
-        # TODO: Create an inverted index.
+        #       Create an inverted index.
         #       Granted this may not be a linked list as in a proper
         #       implementation.
 
@@ -177,7 +177,7 @@ class IRSystem:
         Return an empty list if the query does not return any documents.
         """
         # ------------------------------------------------------------------
-        # TODO: Implement Boolean retrieval. You will want to use your
+        #       Implement Boolean retrieval. You will want to use your
         #       inverted index that you created in index().
         # Right now this just returns all the possible documents!
         docs = list(range(len(self.docs)))
@@ -210,7 +210,7 @@ class IRSystem:
     def compute_tfidf(self):
         print("Calculating tf-idf...")
         # -------------------------------------------------------------------
-        # TODO: Compute and store TF-IDF values for words and documents.
+        #       Compute and store TF-IDF values for words and documents.
         #       Recall that you can make use of:
         #         * self.vocab: a list of all distinct (stemmed) words
         #         * self.docs: a list of lists, where the i-th document is
@@ -257,7 +257,7 @@ class IRSystem:
         """
         scores = [0.0 for xx in range(len(self.docs))]
         # ------------------------------------------------------------------
-        # TODO: Implement cosine similarity between a document and a list of
+        #       Implement cosine similarity between a document and a list of
         #       query words.
 
         # Right now, this code simply gets the score by taking the Jaccard
