@@ -43,6 +43,8 @@ class PCFGParser(Parser):
 
         possible_tags = self.lexicon.get_all_tags()
 
+        print("All tags: ",possible_tags)
+
         # tagged_sentence = []
         # scored_sentence = []
 
@@ -71,80 +73,100 @@ class PCFGParser(Parser):
             for tag in possible_tags:
                 word = sentence[index]
                 tag_value = self.lexicon.score_tagging(word, tag)
+                print("Tag ",tag," has value ",tag_value," for word ",word)
                 if tag_value > 0:
                     score_dict[(index, index+1)][tag] = tag_value
 
-                added = True
-                while added:
-                    added = False
-                    for child_tag in possible_tags:
-                        tag_rules = self.grammar.get_unary_rules_by_child(child_tag)
-                        for rule in tag_rules:
-                            parent = rule.parent
-                            child = rule.child
-                            key = (index, index+1)
-                            score = rule.score * score_dict[key][child]
-                            if score > score_dict[key][parent]:
-                                score_dict[key][parent] = score
-                                rules_dict[key][parent] = [child]
-                                added = True
+            added = True
+            while added:
+                added = False
+                for child_tag in possible_tags:
+                    tag_rules = self.grammar.get_unary_rules_by_child(child_tag)
+                    for rule in tag_rules:
+                        parent = rule.parent
+                        child = rule.child
+                        print("Unary parent: ",parent,", Unary child: ",child)
+                        key = (index, index+1)
+                        score = rule.score * score_dict[key][child]
+                        # print("Unary score: ",score)
+                        if score > score_dict[key][parent]:
+                            score_dict[key][parent] = score
+                            rules_dict[key][parent] = [child]
+                            added = True
+            print("Parents of position",index,": ",score_dict[(index,index+1)].keys())
+            print("Parents of position",index,": ",rules_dict[(index,index+1)].keys())
 
-        for span in range(2, end_number+1):
-            for begin in range(end_number-span+1):
-                end = begin + span
-                for split in range(begin+1, end):
-                    left_key = (begin, split)
-                    right_key = (split, end)
 
-                    left_tags = rules_dict[left_key].keys()
-                    right_tags = rules_dict[right_key].keys()
+        for tag in possible_tags:
+            tag_rules = self.grammar.get_unary_rules_by_child(tag)
+            left_tag_rules = self.grammar.get_binary_rules_by_left_child(tag)
+            right_tag_rules = self.grammar.get_binary_rules_by_right_child(tag)
+            print("Rules with tag '", tag, "' as child:", len(tag_rules))
+            for rule in tag_rules:
+                print("Parent:",rule.parent,", child:",rule.child)
+            print("Rules with tag '", tag, "' as left child:", len(left_tag_rules))
+            for rule in left_tag_rules:
+                print("Parent:",rule.parent,", left child:",rule.left_child,", right child:",rule.right_child)
+            print("Rules with tag '", tag, "' as right child:", len(right_tag_rules))
+            for rule in right_tag_rules:
+                print("Parent:",rule.parent,", left child:",rule.left_child,", right child:",rule.right_child)
 
-                    print("Debug tags")
-                    print(left_tags, ' :: ', right_tags)
+        # for span in range(2, end_number+1):
+        #     for begin in range(end_number-span+1):
+        #         end = begin + span
+        #         for split in range(begin+1, end):
+        #             left_key = (begin, split)
+        #             right_key = (split, end)
 
-                    for tag in left_tags:
-                        binary_rules = self.grammar.get_binary_rules_by_left_child(tag)
-                        for rule in binary_rules:
-                            right_child = rule.right_child
-                            print("This parent: ", rule.parent)
-                            print("This right child: ", right_child)
-                            print("This left child: ", rule.left_child)
-                            if right_child in right_tags:
-                                parent = rule.parent
-                                left_child = rule.left_child
-                                key = (begin, end)
-                                print("Regla admitida")
-                                print(rule.score)
-                                print(score_dict[left_key][left_child])
-                                print(score_dict[right_key][right_child])
-                                score = rule.score * score_dict[left_key][left_child] * score_dict[right_key][right_child]
-                                if score > score_dict[key][parent]:
-                                    score_dict[key][parent] = score
-                                    rules_dict[key][parent] = [left_child, right_child, split]
+        #             left_tags = score_dict[left_key].keys()
+        #             right_tags = score_dict[right_key].keys()
+
+        #             print("Debug tags")
+        #             print("Keys:",left_key,"::",right_key ,"Tags:",left_tags, ' :: ', right_tags)
+
+        #             for tag in left_tags:
+        #                 binary_rules = self.grammar.get_binary_rules_by_left_child(tag)
+        #                 for rule in binary_rules:
+        #                     right_child = rule.right_child
+        #                     print("This parent: ", rule.parent)
+        #                     print("This right child: ", right_child)
+        #                     print("This left child: ", rule.left_child)
+        #                     if right_child in right_tags:
+        #                         parent = rule.parent
+        #                         left_child = rule.left_child
+        #                         key = (begin, end)
+        #                         print("Regla admitida")
+        #                         print(rule.score)
+        #                         print(score_dict[left_key][left_child])
+        #                         print(score_dict[right_key][right_child])
+        #                         score = rule.score * score_dict[left_key][left_child] * score_dict[right_key][right_child]
+        #                         if score > score_dict[key][parent]:
+        #                             score_dict[key][parent] = score
+        #                             rules_dict[key][parent] = [left_child, right_child, split]
                 
-                added = True
-                while added:
-                    added = False
-                    for child_tag in possible_tags:
-                        unary_rules = self.grammar.get_unary_rules_by_child(child_tag)
-                        for rule in unary_rules:
-                            parent = rule.parent
-                            child = rule.child
-                            key = (begin, end)
-                            score = rule.score * score_dict[key][child]
-                            if score > score_dict[key][parent]:
-                                score_dict[key][parent] = score
-                                rules_dict[key][parent] = child
-                                added = True
+        #         added = True
+        #         while added:
+        #             added = False
+        #             for child_tag in possible_tags:
+        #                 unary_rules = self.grammar.get_unary_rules_by_child(child_tag)
+        #                 for rule in unary_rules:
+        #                     parent = rule.parent
+        #                     child = rule.child
+        #                     key = (begin, end)
+        #                     score = rule.score * score_dict[key][child]
+        #                     if score > score_dict[key][parent]:
+        #                         score_dict[key][parent] = score
+        #                         rules_dict[key][parent] = child
+        #                         added = True
 
 
                     
-        print(score_dict.keys())
+        # print(score_dict.keys())
 
-        key = (0, 2)
-        dict_keys = score_dict[key].keys()
-        for llave in dict_keys:
-            print("Clave: ", key , llave, ' + ', score_dict[key][llave])
+        # key = (0, 2)
+        # dict_keys = score_dict[key].keys()
+        # for llave in dict_keys:
+        #     print("Clave: ", key , llave, ' + ', score_dict[key][llave])
         #######################################
         return TreeBinarization.unbinarize_tree(tree)
 
