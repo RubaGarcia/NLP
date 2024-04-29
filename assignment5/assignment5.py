@@ -37,11 +37,13 @@ class PCFGParser(Parser):
         """
         # TODO: implement this method
         #######################################
-        tree=Tree("ROOT",[Tree("S")])
+        tree=Tree("ROOT",[Tree("S", [Tree("Son")]),Tree("S", [Tree("Son")])])
 
         end_number = len(sentence)
 
         possible_tags = self.lexicon.get_all_tags()
+
+        # print("All tags: ",possible_tags)
 
         # tagged_sentence = []
         # scored_sentence = []
@@ -71,23 +73,73 @@ class PCFGParser(Parser):
             for tag in possible_tags:
                 word = sentence[index]
                 tag_value = self.lexicon.score_tagging(word, tag)
+                # print("Tag ",tag," has value ",tag_value," for word ",word)
                 if tag_value > 0:
                     score_dict[(index, index+1)][tag] = tag_value
 
-                added = True
-                while added:
-                    added = False
-                    for child_tag in possible_tags:
-                        tag_rules = self.grammar.get_unary_rules_by_child(child_tag)
-                        for rule in tag_rules:
-                            parent = rule.parent
-                            child = rule.child
-                            key = (index, index+1)
-                            score = rule.score * score_dict[key][child]
-                            if score > score_dict[key][parent]:
-                                score_dict[key][parent] = score
-                                rules_dict[key][parent] = [child]
-                                added = True
+            added = True
+            new_elements = possible_tags
+            while added:
+                added = False
+                iterable_tags = new_elements
+                new_elements = []
+                for child_tag in iterable_tags:
+                    tag_rules = self.grammar.get_unary_rules_by_child(child_tag)
+                    for rule in tag_rules:
+                        parent = rule.parent
+                        child = rule.child
+                        # print("Unary parent: ",parent,", Unary child: ",child)
+                        key = (index, index+1)
+                        score = rule.score * score_dict[key][child]
+                        # print("Unary score: ",score)
+                        # print("Rule score: ", rule.score)
+                        # print("Child score: ", score_dict[key][child])
+                        # print("Unary score: ",score)
+                        if score > score_dict[key][parent]:
+                            score_dict[key][parent] = score
+                            rules_dict[key][parent] = [child]
+                            new_elements.append(parent)
+                            added = True
+
+            # added = True
+            # while added:
+            #     added = False
+            #     key = (index, index+1)
+            #     unary_tags = score_dict[key].keys()
+            #     for child_tag in unary_tags:
+            #         tag_rules = self.grammar.get_unary_rules_by_child(child_tag)
+            #         for rule in tag_rules:
+            #             parent = rule.parent
+            #             child = rule.child
+            #             print("Unary parent: ",parent,", Unary child: ",child)
+            #             score = rule.score * score_dict[key][child]
+            #             # print("Unary score: ",score)
+            #             if score > score_dict[key][parent]:
+            #                 score_dict[key][parent] = score
+            #                 rules_dict[key][parent] = [child]
+            #                 added = True
+            # print("Parents of position",index,": ",score_dict[(index,index+1)].keys())
+            # print("Parents of position",index,": ",rules_dict[(index,index+1)].keys())
+
+
+        # for tag in possible_tags:
+        #     tag_rules = self.grammar.get_unary_rules_by_child(tag)
+        #     left_tag_rules = self.grammar.get_binary_rules_by_left_child(tag)
+        #     right_tag_rules = self.grammar.get_binary_rules_by_right_child(tag)
+        #     print("Rules with tag '", tag, "' as child:", len(tag_rules))
+        #     for rule in tag_rules:
+        #         print("Parent:",rule.parent,", child:",rule.child)
+        #     print("Rules with tag '", tag, "' as left child:", len(left_tag_rules))
+        #     for rule in left_tag_rules:
+        #         print("Parent:",rule.parent,", left child:",rule.left_child,", right child:",rule.right_child)
+        #     print("Rules with tag '", tag, "' as right child:", len(right_tag_rules))
+        #     for rule in right_tag_rules:
+        #         print("Parent:",rule.parent,", left child:",rule.left_child,", right child:",rule.right_child)
+
+        # NP_rules = self.grammar.get_unary_rules_by_child('NP')
+        # print("Rules with tag NP as child:", len(self.grammar.get_unary_rules_by_child('NP')))
+        # for rule in NP_rules:
+        #     print("Parent:",rule.parent,", child:",rule.child)
 
         for span in range(2, end_number+1):
             for begin in range(end_number-span+1):
@@ -96,55 +148,107 @@ class PCFGParser(Parser):
                     left_key = (begin, split)
                     right_key = (split, end)
 
-                    left_tags = rules_dict[left_key].keys()
-                    right_tags = rules_dict[right_key].keys()
+                    left_tags = score_dict[left_key].keys()
+                    right_tags = score_dict[right_key].keys()
 
-                    print("Debug tags")
-                    print(left_tags, ' :: ', right_tags)
+                    # print("Debug tags")
+                    # print("Keys:",left_key,"::",right_key ,"Tags:",left_tags, ' :: ', right_tags)
 
                     for tag in left_tags:
                         binary_rules = self.grammar.get_binary_rules_by_left_child(tag)
                         for rule in binary_rules:
                             right_child = rule.right_child
-                            print("This parent: ", rule.parent)
-                            print("This right child: ", right_child)
-                            print("This left child: ", rule.left_child)
+                            # print("This parent: ", rule.parent)
+                            # print("This right child: ", right_child)
+                            # print("This left child: ", rule.left_child)
                             if right_child in right_tags:
                                 parent = rule.parent
                                 left_child = rule.left_child
                                 key = (begin, end)
-                                print("Regla admitida")
-                                print(rule.score)
-                                print(score_dict[left_key][left_child])
-                                print(score_dict[right_key][right_child])
+                                # print("Regla admitida")
+                                # print(rule.score)
+                                # print(score_dict[left_key][left_child])
+                                # print(score_dict[right_key][right_child])
                                 score = rule.score * score_dict[left_key][left_child] * score_dict[right_key][right_child]
                                 if score > score_dict[key][parent]:
                                     score_dict[key][parent] = score
                                     rules_dict[key][parent] = [left_child, right_child, split]
+                                # else:
+                                #     print("No admitida, score obtenido: ", score, "; score no superado: ",score_dict[key][parent])
                 
+                # added = True
                 added = True
+                # new_elements = list(set(list(left_tags) + list(right_tags)))
+                new_elements = possible_tags
+                new_elements = score_dict[(begin,end)].keys()
                 while added:
                     added = False
-                    for child_tag in possible_tags:
-                        unary_rules = self.grammar.get_unary_rules_by_child(child_tag)
-                        for rule in unary_rules:
+                    iterable_tags = list(new_elements)
+                    new_elements = []
+                    for child_tag in iterable_tags:
+                        tag_rules = self.grammar.get_unary_rules_by_child(child_tag)
+                        for rule in tag_rules:
                             parent = rule.parent
                             child = rule.child
+                            # print("Unary parent: ",parent,", Unary child: ",child)
                             key = (begin, end)
                             score = rule.score * score_dict[key][child]
+                            # print("Rule score: ", rule.score)
+                            # print("Child score: ", score_dict[key][child])
+                            # print("Unary score: ",score)
                             if score > score_dict[key][parent]:
                                 score_dict[key][parent] = score
-                                rules_dict[key][parent] = child
+                                rules_dict[key][parent] = [child]
+                                new_elements.append(parent)
                                 added = True
 
-
                     
-        print(score_dict.keys())
+        # print(score_dict.keys())
 
-        key = (0, 2)
-        dict_keys = score_dict[key].keys()
-        for llave in dict_keys:
-            print("Clave: ", key , llave, ' + ', score_dict[key][llave])
+        # for begin in range(end_number):
+        #     for end in range(begin+1, end_number+1):
+        #         print("(",begin,",",end,") scores:")
+        #         for llave in score_dict[(begin,end)].keys():
+        #             print(llave, ":",score_dict[(begin,end)][llave])
+
+        def construct_tree(label, begin, end):
+            siguiente = rules_dict[(begin,end)][label]
+            # print("Indices recibidos:",begin,",",end)
+            # print(siguiente)
+            returning_tree = None
+            if (len(siguiente) == 3):
+                left_label, right_label, split = siguiente
+                if (left_label in rules_dict[(begin,split)].keys()):
+                    left_node = construct_tree(left_label, begin, split)
+                else:
+                    left_node = Tree(left_label, [Tree(sentence[begin])])
+
+                if (right_label in rules_dict[(split,end)].keys()):
+                    right_node = construct_tree(right_label, split, end)
+                else:
+                    right_node = Tree(right_label, [Tree(sentence[split])])
+
+                returning_tree = Tree(label, [left_node, right_node])
+            elif (len(siguiente) == 1):
+                next_label = siguiente[0]
+                # print("Begin:",begin)
+                # print("End:",end)
+                # print(rules_dict[(begin,end)].keys())
+                if (next_label in rules_dict[(begin,end)].keys()):
+                    # print("Label",label,"has continuation")
+                    node = construct_tree(next_label,begin,end)
+                else:
+                    # print("Ending reached")
+                    node = Tree(next_label, [Tree(sentence[begin])])
+
+                returning_tree = Tree(label, [node])
+            
+            return returning_tree
+            # pass
+        
+        # main_label = "ROOT"
+        # print("Construccion")
+        tree = construct_tree("ROOT", 0, end_number)
         #######################################
         return TreeBinarization.unbinarize_tree(tree)
 
@@ -561,9 +665,9 @@ def read_masc_trees(base_path, low=None, high=None):
 
 if __name__ == '__main__':
     opt_parser = optparse.OptionParser()
-    opt_parser.add_option("--data", dest="data", default = "miniTest") #change default value ("miniTest") to "masc"
+    opt_parser.add_option("--data", dest="data", default = "masc") #change default value ("miniTest") to "masc"
     opt_parser.add_option("--parser", dest="parser",default="PCFGParser") # change default value ("BaselineParser") to "PCFGParser"
-    opt_parser.add_option("--maxLength", dest="max_length",default="20") 
+    opt_parser.add_option("--maxLength", dest="max_length",default="20")    
 
     (options, args) = opt_parser.parse_args()
     options = vars(options)
