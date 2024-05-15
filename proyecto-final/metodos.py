@@ -1,5 +1,7 @@
 ''''''
 def lexical_richness(text):
+    if len(text) < 1:
+        return 0
     return len(set(text)) / len(text)  
 ''''''
 # def percentage(word, text):
