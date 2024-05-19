@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 ''''''
 def lexical_richness(text):
     if len(text) < 1:
@@ -24,3 +25,21 @@ def display():
     pylab.xlabel('Model Size')
     pylab.ylabel('Performance')
     pylab.show()
+
+def displayWordFreq(freqDist, commons, human):
+    
+    freqDist = freqDist.most_common(commons)
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(range(len(freqDist)), [count for word, count in freqDist], align='center')
+    plt.xticks(range(len(freqDist)), [word for word, count in freqDist], rotation=90)
+    # plt.bar(range(len(fdist_human)), [count for word, count in fdist_human.items()], align='center')
+    # plt.xticks(range(len(fdist_human)), [word for word, count in fdist_human.items()], rotation=90)
+    plt.xlabel('Words')
+    plt.ylabel('Frequency')
+    if human==True:
+        plt.title('Frequency Distribution of Human Variable')
+    else:
+        plt.title('Frequency Distribution of AI Variable')
+    
+    plt.show()  
