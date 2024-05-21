@@ -43,3 +43,4 @@ def displayWordFreq(freqDist, commons, human):
         plt.title('Frequency Distribution of AI Variable')
     
     plt.show()  
+
